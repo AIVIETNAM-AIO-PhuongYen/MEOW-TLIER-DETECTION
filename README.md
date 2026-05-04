@@ -15,4 +15,4 @@ Dự án nhằm phát hiện các hành vi sinh hoạt bất thường (Outliers
 
 ## 4. Quy tắc làm việc cho Team
 - **Git:** Mỗi task trên Jira tương ứng với 1 branch `feature/mã-task`.
-- **Jira:** Cập nhật trạng thái task hàng ngày (To Do -> In Progress -> Done).
+- **Jira:** Cập nhật trạng thái task hàng ngày (Chưa làm -> Đang làm -> (Đang gặp vấn đề) -> Chờ duyệt -> Hoàn thành).
