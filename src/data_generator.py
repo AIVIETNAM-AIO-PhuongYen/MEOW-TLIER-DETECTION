@@ -57,3 +57,6 @@ def generate_cat_data():
     df_clean.to_csv('data/clean.csv', index=False)
     df_noisy.to_csv('data/noisy.csv', index=False)
     df_extreme.to_csv('data/extreme.csv', index=False)
+
+if __name__ == '__main__':
+    generate_cat_data()
