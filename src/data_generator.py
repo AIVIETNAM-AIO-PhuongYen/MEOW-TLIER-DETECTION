@@ -1,20 +1,23 @@
 import numpy as np
 import pandas as pd
-import os
+from pathlib import Path
 
 def generate_cat_data():
     """
     Hàm sinh dữ liệu giả lập (Synthetic Data) về hành vi sinh hoạt của mèo.
     Bao gồm 3 file: clean.csv, noisy.csv, extreme.csv
     """
-    os.makedirs('data', exist_ok=True)
+    # 1. XÁC ĐỊNH ĐƯỜNG DẪN: Tự động tìm folder /data 
+    data_dir = Path(__file__).resolve().parent.parent / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    
     np.random.seed(42) 
     
     n_records = 1000
     mean_food, std_food = 65, 10
     mean_sleep, std_sleep = 14, 2
 
-    #CLEAN DATA
+    # CLEAN DATA
     # Tạo số liệu theo chuẩn Normal Distribution
     food_clean = np.clip(np.random.normal(mean_food, std_food, n_records), 10, 150) # lượng thức ăn từ 10 -> 150
     sleep_clean = np.clip(np.random.normal(mean_sleep, std_sleep, n_records), 1, 24) # số giờ ngủ từ 1 -> 24h
@@ -22,7 +25,8 @@ def generate_cat_data():
     # Tạo bảng và làm tròn số
     df_clean = pd.DataFrame({
         'food_weight_g': np.round(food_clean, 2),
-        'sleep_hours': np.round(sleep_clean, 2)
+        'sleep_hours': np.round(sleep_clean, 2),
+        'is_outlier': 0 # Thêm cột mặc định là 0
     })
 
     # NOISY DATA (Sensor errors, human errors)
@@ -30,18 +34,20 @@ def generate_cat_data():
     noise_food = np.random.normal(0, 5, n_records)    
     noise_sleep = np.random.normal(0, 1, n_records) 
     
-
     df_noisy = pd.DataFrame({
         'food_weight_g': np.round(np.clip(food_clean + noise_food, 5, 180), 2),
-        'sleep_hours': np.round(np.clip(sleep_clean + noise_sleep, 0, 24), 2)
+        'sleep_hours': np.round(np.clip(sleep_clean + noise_sleep, 0, 24), 2),
+        'is_outlier': 0 # Thêm cột mặc định là 0
     })
 
-    # EXTREME DATA (Outliers injection)
+    # EXTREME DATA 
     df_extreme = df_clean.copy()
+    df_extreme['is_outlier'] = 0
     n_outliers = int(0.05 * n_records) # Tạo 5% số mèo bất thường
     outlier_indices = np.random.choice(n_records, n_outliers, replace=False)
 
     for idx in outlier_indices:
+        df_extreme.loc[idx, 'is_outlier'] = 1
         outlier_type = np.random.choice(['anorexia', 'binge_eating', 'insomnia', 'lethargy'])
 
         if outlier_type == 'anorexia': # Bỏ ăn
@@ -53,10 +59,11 @@ def generate_cat_data():
         elif outlier_type == 'lethargy': # Ngủ li bì
             df_extreme.loc[idx, 'sleep_hours'] = np.round(np.random.uniform(20, 24), 2) 
 
-    # 5. SAVE TO CSV
-    df_clean.to_csv('data/clean.csv', index=False)
-    df_noisy.to_csv('data/noisy.csv', index=False)
-    df_extreme.to_csv('data/extreme.csv', index=False)
+    # 5. SAVE TO CSV 
+    df_clean.to_csv(data_dir / 'clean.csv', index=False)
+    df_noisy.to_csv(data_dir / 'noisy.csv', index=False)
+    df_extreme.to_csv(data_dir / 'extreme.csv', index=False)
+    
 
 if __name__ == '__main__':
     generate_cat_data()
