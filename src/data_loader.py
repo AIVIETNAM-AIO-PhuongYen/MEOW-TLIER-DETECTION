@@ -4,8 +4,9 @@ import seaborn as sns
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
-
+# DataLoader class to handle data loading, distribution plotting, and scaling
 class DataLoader:
+    # Initialize with the file name and set up the base directory
     def __init__(self, file_name="clean.csv"):
         try:
             self.base_dir = Path(__file__).resolve().parent.parent / "data"
@@ -15,6 +16,7 @@ class DataLoader:
         self.file_path = self.base_dir / file_name
         self.df = None
 
+    # Load data from the specified CSV file
     def load_data(self):
         if not self.file_path.exists():
             raise FileNotFoundError(f"Cannot find file at {self.file_path}")
@@ -22,6 +24,7 @@ class DataLoader:
         self.df = pd.read_csv(self.file_path)
         return self.df
 
+    # Plot the distribution of specified columns using seaborn
     def plot_distribution(self, columns):
         if self.df is None: return
 
@@ -35,7 +38,7 @@ class DataLoader:
         plt.tight_layout()
         plt.show()
 
-
+    # Scale the specified columns using either StandardScaler or MinMaxScaler
     def scale_data(self, columns, method='standard'):
         if self.df is None: return None
         
@@ -46,6 +49,9 @@ class DataLoader:
         
         return df_scaled
 
+
+
+# Example usage
 if __name__ == "__main__":
     loader = DataLoader("clean.csv")
 
@@ -56,5 +62,4 @@ if __name__ == "__main__":
 
         df_scaled = loader.scale_data(['food_weight_g', 'sleep_hours'], method='standard')
         print(df_scaled.head())
-        
     except Exception as e: print(e)
