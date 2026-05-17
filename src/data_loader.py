@@ -48,8 +48,7 @@ class DataLoader:
         df_scaled[columns] = scaler.fit_transform(self.df[columns])
         
         return df_scaled
-
-
+    
 
 # Example usage
 if __name__ == "__main__":
