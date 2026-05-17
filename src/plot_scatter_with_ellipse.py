@@ -5,23 +5,21 @@ from matplotlib.patches import Ellipse
 import seaborn as sns
 from pathlib import Path
 
-# INLIER_COLOR = '#F5F5DC'
-# OUTLIER_COLOR = '#A0522D'
-# ELIP_RING_COLOR = '#FFB6C1'
+INLIER_COLOR = '#F5F5DC'
+OUTLIER_COLOR = '#A0522D'
+ELIP_RING_COLOR = '#FFB6C1'
 
-INLIER_COLOR = 'red'
-OUTLIER_COLOR = 'blue'
-ELIP_RING_COLOR = 'green'
+# INLIER_COLOR = 'red'
+# OUTLIER_COLOR = 'blue'
+# ELIP_RING_COLOR = 'green'
 
 def draw_outlier_ellipse(ax, x_values, y_values, n_std=3.0, **kwargs):
 	"""
 	Vẽ một elip theo ma trận hiệp phương sai của các điểm (x_values, y_values).
-
-	Ý tưởng:
-	- Tính ma trận hiệp phương sai của các điểm (2x2).
-	- Lấy trị số riêng và vectơ riêng (eigen decomposition) để tìm hướng và độ dài
+	1. Tính ma trận hiệp phương sai của các điểm (2x2).
+	2. Lấy trị số riêng và vectơ riêng (eigen decomposition) để tìm hướng và độ dài
 	  của 2 trục chính của elip.
-	- Kích thước elip theo số độ lệch chuẩn `n_std` (ví dụ 2 std ~ 95% với Gaussian).
+	3. Kích thước elip theo số độ lệch chuẩn `n_std`
 
 	Tham số:
 	- ax: trục matplotlib để vẽ lên.
@@ -58,14 +56,14 @@ def draw_outlier_ellipse(ax, x_values, y_values, n_std=3.0, **kwargs):
 	ax.add_patch(ellipse)
 
 
-def plot_scatter_with_ellipse(df, x_col='food_weight_g', y_col='sleep_hours', hue_column='is_outlier'):
+def plot_scatter_with_ellipse(df, x_col='food_weight_g', y_col='sleep_hours', hue_column='is_outlier', elip_std=3.0, inlier_color=INLIER_COLOR, outlier_color=OUTLIER_COLOR, elip_ring_color=ELIP_RING_COLOR, **kwargs):
 	"""
 	Vẽ scatter 2 chiều cho hai cột `x_col` và `y_col`, phân màu theo `hue_column` (nếu có),
 	và thêm elip bao quanh các điểm không phải outlier (is_outlier == 0).
 
 	1. Tách các điểm inlier và outlier (nếu cột `hue_column` có mặt).
 	2. Vẽ scatter cho inlier (màu xanh) và outlier (màu đỏ) nếu có.
-	3. Tính ma trận hiệp phương sai của các điểm inlier và vẽ elip (theo số std `n_std`).
+	3. Tính ma trận hiệp phương sai của các điểm inlier và vẽ elip (theo số std `elip_std`).
     """
 
 	# Lấy dataframe với các cột cần dùng
@@ -84,7 +82,7 @@ def plot_scatter_with_ellipse(df, x_col='food_weight_g', y_col='sleep_hours', hu
 		data=inlier_points,
 		x=x_col,
 		y=y_col,
-		color=INLIER_COLOR,
+		color=inlier_color,
 		s=45,
 		alpha=0.75,
 		label='Non-outlier',
@@ -97,7 +95,7 @@ def plot_scatter_with_ellipse(df, x_col='food_weight_g', y_col='sleep_hours', hu
 			data=outlier_points,
 			x=x_col,
 			y=y_col,
-			color=OUTLIER_COLOR,
+			color=outlier_color,
 			s=45,
 			alpha=0.85,
 			label='Outlier',
@@ -109,8 +107,8 @@ def plot_scatter_with_ellipse(df, x_col='food_weight_g', y_col='sleep_hours', hu
 		ax,
 		inlier_points[x_col].to_numpy(),
 		inlier_points[y_col].to_numpy(),
-		n_std=3.0,
-		edgecolor=ELIP_RING_COLOR,
+		n_std=elip_std,
+		edgecolor=elip_ring_color,
 		linewidth=2,
 		linestyle='--',
 		label='Elip boundary',
@@ -126,5 +124,5 @@ def plot_scatter_with_ellipse(df, x_col='food_weight_g', y_col='sleep_hours', hu
 if __name__ == "__main__":
     data_path = Path(__file__).resolve().parent.parent / 'data' / 'extreme.csv'
     data = pd.read_csv(data_path)
-    plot_scatter_with_ellipse(data)
+    plot_scatter_with_ellipse(data, elip_std=3.0, inlier_color=INLIER_COLOR, outlier_color=OUTLIER_COLOR, elip_ring_color=ELIP_RING_COLOR)
 
